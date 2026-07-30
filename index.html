@@ -47,15 +47,25 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+            background: #0F172A;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        .lang-indicator {
+            color: #06B6D4;
+            font-weight: bold;
+            font-size: 14px;
         }
         .mode-select {
             background: #334155;
             color: #FFF;
             border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             outline: none;
             cursor: pointer;
+            font-size: 13px;
         }
         .box-title {
             font-size: 14px;
@@ -142,12 +152,12 @@
 <div class="container">
     <div class="header">
         <h1>Myanmar Translator</h1>
-        <p>အင်္ဂလိပ်-မြန်မာ အမြန်ဆုံးနှင့် အတိကျဆုံး ဘာသာပြန်စနစ်</p>
+        <p>အင်္ဂလိပ် ↔ မြန်မာ နှစ်ဦးနှစ်ဖက် အပြန်အလှန် ဘာသာပြန်စနစ်</p>
     </div>
 
-    <!-- Mode Selector -->
+    <!-- Direction Indicator & Mode Selector -->
     <div class="controls">
-        <span class="box-title">ဘာသာပြန်အမျိုးအစား:</span>
+        <span class="lang-indicator">🔄 Auto-Detect (EN ↔ MM)</span>
         <select id="toneSelect" class="mode-select">
             <option value="casual">အရပ်ဘက်သုံး (Casual)</option>
             <option value="formal">ရုံးသုံး / တရားဝင် (Formal)</option>
@@ -156,8 +166,8 @@
     </div>
 
     <!-- Input Box -->
-    <div class="box-title">စာရိုက်ထည့်ရန် (သို့) ကူးထည့်ရန်:</div>
-    <textarea id="inputText" placeholder="Type or paste English or Myanmar text here..."></textarea>
+    <div class="box-title">စာရိုက်ထည့်ရန် (အင်္ဂလိပ် သို့မဟုတ် မြန်မာ):</div>
+    <textarea id="inputText" placeholder="Type English or Myanmar text here... (အင်္ဂလိပ် သို့မဟုတ် မြန်မာစာ ရိုက်ထည့်ပါ)"></textarea>
     
     <div class="btn-group">
         <button class="btn" onclick="pasteText()">📋 Paste</button>
@@ -216,7 +226,7 @@
         alert('WavePay ဖုန်းနံပါတ် 09663711680 ကို Copy ကူးပြီးပါပြီ!');
     }
 
-    // Translation Logic (Free Client Engine)
+    // Smart Bi-directional Translation Logic (English <-> Myanmar)
     async function translateText() {
         const text = document.getElementById('inputText').value.trim();
         const outputBox = document.getElementById('outputText');
@@ -228,15 +238,24 @@
 
         outputBox.value = 'ဘာသာပြန်နေပါသည်... ခဏစောင့်ပါ...';
 
+        // Detect if input contains Myanmar Unicode characters
+        const isMyanmar = /[\u1000-\u109F]/.test(text);
+        
+        // If Myanmar, translate to English ('en'). If English, translate to Myanmar ('my').
+        const sourceLang = isMyanmar ? 'my' : 'en';
+        const targetLang = isMyanmar ? 'en' : 'my';
+
         try {
-            // Free Translation Engine Integration ($0 Cost)
-            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=my&dt=t&q=${encodeURIComponent(text)}`);
+            // Free Dual-direction Translation Engine ($0 Cost)
+            const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`);
             const data = await res.json();
             
             let translatedText = '';
-            data[0].forEach(item => {
-                if (item[0]) translatedText += item[0];
-            });
+            if (data && data[0]) {
+                data[0].forEach(item => {
+                    if (item[0]) translatedText += item[0];
+                });
+            }
 
             outputBox.value = translatedText;
         } catch (error) {
@@ -246,5 +265,5 @@
 </script>
 
 </body>
-  </html>
-          
+    </html>
+    
