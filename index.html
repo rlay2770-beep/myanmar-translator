@@ -19,14 +19,18 @@
         textarea { width: 100%; height: 110px; background: #0F172A; border: 1px solid #334155; color: #FFF; padding: 12px; border-radius: 10px; resize: none; font-size: 15px; outline: none; }
         textarea:focus { border-color: #06B6D4; }
         .btn-group { display: flex; gap: 8px; margin-top: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .btn { background: #334155; color: #FFF; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
+        .btn { background: #334155; color: #FFF; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px; transition: 0.2s; text-decoration: none; }
         .btn:hover { background: #475569; }
+        .btn-call { background: #10B981; color: #FFF; } /* Call Button Color */
+        .btn-viber { background: #7360F2; color: #FFF; } /* Viber Button Color */
+        .btn-clear { background: #EF4444; color: #FFF; font-size: 11px; padding: 4px 8px; }
         .btn-translate { background: #06B6D4; color: #000; font-weight: bold; width: 100%; padding: 12px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; border: none; font-size: 16px; }
         .btn-translate:hover { background: #22D3EE; }
-        .history-box { margin-top: 15px; background: #0F172A; padding: 10px; border-radius: 8px; border: 1px solid #334155; max-height: 120px; overflow-y: auto; font-size: 12px; color: #94A3B8; }
+        .history-box { margin-top: 8px; background: #0F172A; padding: 10px; border-radius: 8px; border: 1px solid #334155; max-height: 120px; overflow-y: auto; font-size: 12px; color: #94A3B8; }
+        .history-item { margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px dashed #1E293B; }
         .donation-card { margin-top: 20px; background: rgba(6, 182, 212, 0.1); border: 1px dashed #06B6D4; padding: 12px; border-radius: 10px; text-align: center; font-size: 13px; }
         .donation-card b { color: #06B6D4; }
-        .num-box { display: inline-block; background: #0F172A; padding: 4px 10px; border-radius: 6px; margin: 5px 0; font-family: monospace; font-size: 14px; }
+        .num-box { display: inline-block; background: #0F172A; padding: 4px 10px; border-radius: 6px; margin: 5px 0; font-family: monospace; font-size: 14px; color: #06B6D4; }
     </style>
 </head>
 <body>
@@ -67,17 +71,27 @@
         <button class="btn" onclick="speakOutput()">🔊 အသံထွက်နားထောင်မည်</button>
     </div>
 
-    <!-- History List -->
-    <div class="box-title" style="margin-top: 10px;">🕒 မကြာသေးမီက ဘာသာပြန်မှုများ:</div>
+    <!-- History List Section -->
+    <div class="box-header" style="margin-top: 15px;">
+        <div class="box-title">🕒 မကြာသေးမီက ဘာသာပြန်မှုများ:</div>
+        <button class="btn btn-clear" onclick="clearHistory()">🗑️ Clear History</button>
+    </div>
     <div class="history-box" id="historyList">
         <i>မှတ်တမ်းမရှိသေးပါ။</i>
     </div>
 
-    <!-- Support / Donation Card -->
+    <!-- Support / Contact Card -->
     <div class="donation-card">
         ကူညီထောက်ပံ့နိုင်ပါသည် ❤️<br>
-        <b>WavePay:</b> <span class="num-box" id="waveNum">09663711680</span>
-        <button class="btn" style="margin: 5px auto 0 auto;" onclick="copyWave()">Copy Wave Number</button>
+        <b>WavePay / Phone:</b> <span class="num-box">09663711680</span>
+        
+        <div class="btn-group" style="justify-content: center; margin-bottom: 0; margin-top: 8px;">
+            <!-- တိုက်ရိုက် ဖုန်းခေါ်ဆိုရန် -->
+            <a href="tel:09663711680" class="btn btn-call">📞 တိုက်ရိုက်ဖုန်းခေါ်မည်</a>
+            <!-- Viber သို့ တိုက်ရိုက်သွားရန် -->
+            <a href="viber://chat?number=%2B959663711680" class="btn btn-viber">💬 Viber သို့သွားမည်</a>
+            <button class="btn" onclick="copyWave()">📋 Copy Number</button>
+        </div>
     </div>
 </div>
 
@@ -113,10 +127,10 @@
 
     function copyWave() {
         navigator.clipboard.writeText('09663711680');
-        alert('WavePay ဖုန်းနံပါတ် 09663711680 ကို Copy ကူးပြီးပါပြီ!');
+        alert('ဖုန်းနံပါတ် 09663711680 ကို Copy ကူးပြီးပါပြီ!');
     }
 
-    // Voice Speech to Text (အသံဖြင့် စာရိုက်ခြင်း)
+    // Speech to Text (အသံဖြင့် စာရိုက်ခြင်း)
     function startVoiceInput() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             alert('သင့် Browser တွင် Voice Input စနစ် မပံ့ပိုးပါ။ Google Chrome ကို သုံးပေးပါ။');
@@ -124,7 +138,7 @@
         }
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
-        recognition.lang = 'en-US'; // အဓိက English အတွက်ထားရှိခြင်း
+        recognition.lang = 'en-US';
 
         recognition.onstart = function() {
             document.getElementById('inputText').placeholder = 'စကားပြောပါ... နားထောင်နေသည်...';
@@ -139,11 +153,28 @@
         recognition.start();
     }
 
-    // Text to Speech (အသံထွက်ဖတ်ပြခြင်း)
+    // Fixed Text-to-Speech (အသံထွက် ဖတ်ပြခြင်း Error ပြင်ဆင်ပြီး)
     function speakOutput() {
-        const text = document.getElementById('outputText').value;
-        if (!text) return;
+        const text = document.getElementById('outputText').value.trim();
+        if (!text) {
+            alert('ဖတ်ပြရန် စာမရှိသေးပါ။');
+            return;
+        }
+
+        if (!('speechSynthesis' in window)) {
+            alert('သင့် Browser တွင် အသံထွက်စနစ် မပံ့ပိုးပါ။');
+            return;
+        }
+
+        window.speechSynthesis.cancel(); // ယခင် အသံများကို ရပ်တန့်မည်
+
         const utterance = new SpeechSynthesisUtterance(text);
+        
+        // စာကြောင်းထဲတွင် မြန်မာစာ ပါမပါ စစ်ဆေးခြင်း
+        const isMyanmar = /[\u1000-\u109F]/.test(text);
+        utterance.lang = isMyanmar ? 'my-MM' : 'en-US';
+        utterance.rate = 0.9; // အသံနှုန်းထားကို အနည်းငယ် နှေးပေးထားသည်
+
         window.speechSynthesis.speak(utterance);
     }
 
@@ -151,7 +182,7 @@
     function saveToHistory(input, output) {
         let history = JSON.parse(localStorage.getItem('trans_history') || '[]');
         history.unshift({ input, output });
-        if (history.length > 5) history.pop(); // နောက်ဆုံး ၅ ခုပဲသိမ်းမည်
+        if (history.length > 10) history.pop(); // နောက်ဆုံး ၁၀ ခုအထိ သိမ်းမည်
         localStorage.setItem('trans_history', JSON.stringify(history));
         renderHistory();
     }
@@ -163,7 +194,19 @@
             box.innerHTML = '<i>မှတ်တမ်းမရှိသေးပါ။</i>';
             return;
         }
-        box.innerHTML = history.map(item => `<div>• <b>${item.input}</b> ➔ ${item.output}</div>`).join('');
+        box.innerHTML = history.map(item => `
+            <div class="history-item">
+                <b>• ${item.input}</b> ➔ <span style="color: #06B6D4;">${item.output}</span>
+            </div>
+        `).join('');
+    }
+
+    // History ဖျက်သည့် Function
+    function clearHistory() {
+        if(confirm("History မှတ်တမ်းအားလုံးကို ဖျက်ပစ်ရန် သေချာပါသလား?")) {
+            localStorage.removeItem('trans_history');
+            renderHistory();
+        }
     }
 
     // Translate Core Function
@@ -176,7 +219,7 @@
             return;
         }
 
-        outputBox.value = 'ဘာသာပြန်နေပါသည်...';
+        outputBox.value = 'ဘာသာပြန်နေပါသည်... ခဏစောင့်ပါ...';
 
         const isMyanmar = /[\u1000-\u109F]/.test(text);
         const sourceLang = isMyanmar ? 'my' : 'en';
@@ -200,10 +243,10 @@
         }
     }
 
-    // Page Load ဖြစ်ချိန် History ရေတွက်မည်
+    // Page စတင်ပွင့်ချိန်တွင် History ကို ပြသမည်
     renderHistory();
 </script>
 
 </body>
     </html>
-    
+                
